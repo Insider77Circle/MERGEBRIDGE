@@ -93,3 +93,38 @@ python3 demo.py              # narrated demonstration
 - **Fresh sync state per session** re-advertises history each session
   (still only 4 protocol rounds at this scale). A persistent per-peer sync
   state is the obvious optimization for the real integration.
+
+## Design amendments — external QC review, 2026-11-23
+
+An independent QC review of this design (external model seat, Research &
+Innovation Engine; full review in `qc-review-chatgpt-free-2026-11-23.md`)
+produced three amendments, adopted into the design record:
+
+1. **Convergence is not acceptance — an explicit authority policy is
+   required.** Automerge guarantees that replicas converge; it says
+   nothing about which guest operations the host should *accept*.
+   "Authority-free merge" therefore does not by itself preserve coop's
+   trust model. Stage 1 must add a host-side policy layer, independent of
+   the CRDT: guest operations are admitted only within policy (workspace
+   scope only; protected paths denied; operation-batch and size limits
+   enforced against flooding/churn; binary references hash-verified *and*
+   policy-checked). The host remains the final authority over what is
+   projected to its filesystem.
+2. **Projection must be transactional, incremental, and bypass-aware.**
+   The document/filesystem translation is the design's main risk surface:
+   updates arriving mid-projection must never leave stale or partial
+   state on disk (versioned snapshots, atomic file replacement, recovery
+   from interrupted projection), and changes made to the workspace by a
+   process *outside* the CRDT (an editor, a build tool) must be detected
+   and reconciled — never silently treated as current.
+3. **Binary references need a lifecycle — identity is not availability.**
+   A `{sha256, size}` reference proves what a blob *is*, not that it has
+   *arrived*. The design must specify states and handling for pending,
+   missing, interrupted, and superseded blob transfers, plus garbage
+   collection — otherwise the document can converge perfectly while the
+   workspace remains incomplete.
+
+The review's evidence demands (≥1,000 randomized concurrent-operation
+scenarios with zero silent loss; an adversarial-guest harness; a real
+Firecracker integration compared against the rsync path; performance
+baselines) are adopted as the Stage 1 acceptance bar.
