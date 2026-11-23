@@ -1,0 +1,16 @@
+[package]
+name = "mergebridge-prototype"
+version = "0.1.0"
+edition = "2021"
+
+# MERGEBRIDGE Stage 0/1 prototype: two-process Automerge workspace replicas.
+# See README.md. Not a modification of trailofbits/coop — a proof alongside it.
+
+[dependencies]
+automerge = "0.7"
+sha2 = "0.10"
+hex = "0.4"
+
+[[bin]]
+name = "replica"
+path = "src/bin/replica.rs"
