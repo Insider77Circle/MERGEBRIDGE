@@ -1,0 +1,244 @@
+{
+  "S1a": {
+    "title": "concurrent edits, different regions",
+    "A": {
+      "arm": "A-coop-push-pull",
+      "pull_force": {
+        "host_edits_preserved": false,
+        "guest_edits_preserved": true,
+        "conflict_surfaced": false,
+        "note": "pull --force: no per-file check exists to surface anything",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info\n  format: text\n  file: /var/log/app.log\nfeatures:\n  cache: false\n  telemetry: false\n"
+      },
+      "push": {
+        "outcome": "blocked by check_guest_dirty",
+        "conflict_surfaced": true,
+        "detail": "guest dirty (tracked changes): 'M config.yaml'",
+        "note": "guest work survives in the guest; nothing is merged; coop's message directs the user to pull into a new empty review directory or push --force"
+      },
+      "push_force_override": {
+        "host_edits_preserved": true,
+        "guest_edits_preserved": false,
+        "conflict_surfaced": false,
+        "detail": "mirror rsync (-az --delete) host -> guest",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n",
+        "guest_extra_files_after": []
+      }
+    },
+    "B": {
+      "arm": "B-hash+three-way-merge",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "per_file": {
+        "config.yaml": "three-way merge, clean"
+      },
+      "conflict_copy_present": false,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\n  file: /var/log/app.log\nfeatures:\n  cache: false\n  telemetry: false\n"
+    },
+    "C": {
+      "arm": "C-crdt-prototype",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "note": "the prototype has no conflict-reporting concept; Automerge merges silently by construction",
+      "setup_converged": true,
+      "replicas_converged": true,
+      "projections_identical": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\n  file: /var/log/app.log\nfeatures:\n  cache: false\n  telemetry: false\n"
+    }
+  },
+  "S1b": {
+    "title": "concurrent edits, same line",
+    "A": {
+      "arm": "A-coop-push-pull",
+      "pull_force": {
+        "host_edits_preserved": false,
+        "guest_edits_preserved": true,
+        "conflict_surfaced": false,
+        "note": "pull --force: no per-file check exists to surface anything",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info_GUEST\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+      },
+      "push": {
+        "outcome": "blocked by check_guest_dirty",
+        "conflict_surfaced": true,
+        "detail": "guest dirty (tracked changes): 'M config.yaml'",
+        "note": "guest work survives in the guest; nothing is merged; coop's message directs the user to pull into a new empty review directory or push --force"
+      },
+      "push_force_override": {
+        "host_edits_preserved": true,
+        "guest_edits_preserved": false,
+        "conflict_surfaced": false,
+        "detail": "mirror rsync (-az --delete) host -> guest",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info_HOST\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n",
+        "guest_extra_files_after": []
+      }
+    },
+    "B": {
+      "arm": "B-hash+three-way-merge",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "guest_preservation_form": "conflict copy (main file keeps the host version)",
+      "conflict_surfaced": true,
+      "per_file": {
+        "config.yaml": "CONFLICT: host version kept in place, guest version preserved as config.yaml.conflict-guest"
+      },
+      "conflict_copy_present": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info_HOST\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    },
+    "C": {
+      "arm": "C-crdt-prototype",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "note": "the prototype has no conflict-reporting concept; Automerge merges silently by construction",
+      "setup_converged": true,
+      "replicas_converged": true,
+      "projections_identical": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info_HOST_GUEST\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    }
+  },
+  "S2": {
+    "title": "guest whole-file replace vs host in-place edit",
+    "A": {
+      "arm": "A-coop-push-pull",
+      "pull_force": {
+        "host_edits_preserved": false,
+        "guest_edits_preserved": true,
+        "conflict_surfaced": false,
+        "note": "pull --force: no per-file check exists to surface anything",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: debug\n  format: text\nfeatures:\n  cache: true\n  telemetry: false\n"
+      },
+      "push": {
+        "outcome": "blocked by check_guest_dirty",
+        "conflict_surfaced": true,
+        "detail": "guest dirty (tracked changes): 'M config.yaml'",
+        "note": "guest work survives in the guest; nothing is merged; coop's message directs the user to pull into a new empty review directory or push --force"
+      },
+      "push_force_override": {
+        "host_edits_preserved": true,
+        "guest_edits_preserved": false,
+        "conflict_surfaced": false,
+        "detail": "mirror rsync (-az --delete) host -> guest",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n",
+        "guest_extra_files_after": []
+      }
+    },
+    "B": {
+      "arm": "B-hash+three-way-merge",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "per_file": {
+        "config.yaml": "three-way merge, clean"
+      },
+      "conflict_copy_present": false,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: debug\n  format: text\nfeatures:\n  cache: true\n  telemetry: false\n"
+    },
+    "C": {
+      "arm": "C-crdt-prototype",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": false,
+      "conflict_surfaced": false,
+      "note": "the prototype has no conflict-reporting concept; Automerge merges silently by construction",
+      "setup_converged": true,
+      "replicas_converged": true,
+      "projections_identical": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    }
+  },
+  "S3": {
+    "title": "guest-only edit (control)",
+    "A": {
+      "arm": "A-coop-push-pull",
+      "pull_force": {
+        "host_edits_preserved": null,
+        "guest_edits_preserved": true,
+        "conflict_surfaced": false,
+        "note": "pull --force: no per-file check exists to surface anything",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  workers: 4\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+      },
+      "push": {
+        "outcome": "blocked by check_guest_dirty",
+        "conflict_surfaced": true,
+        "detail": "guest dirty (tracked changes): 'M config.yaml'",
+        "note": "guest work survives in the guest; nothing is merged; coop's message directs the user to pull into a new empty review directory or push --force"
+      },
+      "push_force_override": {
+        "host_edits_preserved": null,
+        "guest_edits_preserved": false,
+        "conflict_surfaced": false,
+        "detail": "mirror rsync (-az --delete) host -> guest",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n",
+        "guest_extra_files_after": []
+      }
+    },
+    "B": {
+      "arm": "B-hash+three-way-merge",
+      "host_edits_preserved": null,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "per_file": {
+        "config.yaml": "guest version taken"
+      },
+      "conflict_copy_present": false,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  workers: 4\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    },
+    "C": {
+      "arm": "C-crdt-prototype",
+      "host_edits_preserved": null,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "note": "the prototype has no conflict-reporting concept; Automerge merges silently by construction",
+      "setup_converged": true,
+      "replicas_converged": true,
+      "projections_identical": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  workers: 4\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    }
+  },
+  "S4": {
+    "title": "host edits config; guest creates new untracked file",
+    "A": {
+      "arm": "A-coop-push-pull",
+      "pull_force": {
+        "host_edits_preserved": false,
+        "guest_edits_preserved": true,
+        "conflict_surfaced": false,
+        "note": "pull --force: no per-file check exists to surface anything",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+      },
+      "push": {
+        "outcome": "proceeded (guard did not fire)",
+        "host_edits_preserved": true,
+        "guest_edits_preserved": false,
+        "conflict_surfaced": false,
+        "detail": "mirror rsync (-az --delete) host -> guest",
+        "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n",
+        "guest_extra_files_after": []
+      }
+    },
+    "B": {
+      "arm": "B-hash+three-way-merge",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "per_file": {
+        "agent_notes.txt": "guest version taken",
+        "config.yaml": "host version kept, guest updated"
+      },
+      "conflict_copy_present": false,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    },
+    "C": {
+      "arm": "C-crdt-prototype",
+      "host_edits_preserved": true,
+      "guest_edits_preserved": true,
+      "conflict_surfaced": false,
+      "note": "the prototype has no conflict-reporting concept; Automerge merges silently by construction",
+      "setup_converged": true,
+      "replicas_converged": true,
+      "projections_identical": true,
+      "final_config": "# mergebridge comparison fixture\nservice:\n  name: coop-demo\n  port: 8080\n  replicas: 2\n  timeout: 30\nlogging:\n  level: info\n  format: text\nfeatures:\n  cache: false\n  telemetry: false\n"
+    }
+  }
+}
